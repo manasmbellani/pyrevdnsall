@@ -5,6 +5,7 @@ Python script to perform reverse dns on /24 or other ranges obtained from subdom
 
 ## Via Docker
 
+build the docker image first
 ```
 docker build -t pyrevdnsall:latest .
 ```
@@ -13,6 +14,7 @@ docker build -t pyrevdnsall:latest .
 
 ### Via Docker
 
+To expand the IPs/ranges/domains in file: `/opt/dockershare/pyrevdnsall/inputs.txt` recursively in reverse, run the command:
 ```
 docker run -v /opt/dockershare:/opt/dockershare -t --rm pyrevdnsall:latest -i /opt/dockershare/pyrevdnsall/inputs.txt
 ```

@@ -80,7 +80,7 @@ def process_input_to_targets(logger, q_stdin, targets):
                     logger.debug(f"Got input: {inline} as IP, adding to targets q")
                     q_targets.put(ip)
 
-                ips = get_slash_24_ips_from_ip(inline)
+                ips = myassets.get_slash_24_ips_from_ip(logger, inline)
                 if ips:
                     logger.debug(f"Extracting IP range from input: {inline} to "
                                  f"add to Q")
@@ -94,6 +94,12 @@ def process_input_to_targets(logger, q_stdin, targets):
                 if ip and ip not in q_targets.queue:
                     logger.debug(f"Got input: {inline} as domain, adding to targets q")
                     q_targets.put(ip)
+
+                    logger.debug(f"Extracting /24 IP range from IP: {ip} and adding new targets to q")
+                    ips = get_slash_24_ips_from_ip(ip)
+                    for ip in ips:
+                        if ip and ip not in q_targets.queue:
+                            q_targets.put(ip)
 
             elif myvalidation.is_ip_range(logger, inline):
                 ip_range = inline

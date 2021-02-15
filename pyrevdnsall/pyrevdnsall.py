@@ -5,7 +5,24 @@ import sys
 import mylogging
 import mythreads
 
+"""Number of threads to use"""
+DEFAULT_NUM_THREADS = 10
+
+"""Description for this script"""
+DESCRIPTION = """
+Script to perform reverse DNS lookup on provided IP address/range to identify
+valid subdomains for an optionally given domain
+"""
+
 def main():
+    parser = argparse.ArgumentParser(description=DESCRIPTION, 
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("-d", "--domain", 
+        help="Main Domain to use to identify valid subdomains")
+    parser.add_argument("-t", "--threads", default=DEFAULT_NUM_THREADS,
+        help="Number of threads to use for scanning")
+    args = parser.parse_args()
+
     logger = mylogging.configure_basic_logging()
 
     try:
@@ -18,13 +35,16 @@ def main():
             logger, 
             mythreads.all_threads,
             mythreads.q_stdin, 
-            mythreads.q_targets)
+            mythreads.q_targets,
+            num_threads=int(args.threads))
 
         mythreads.launch_threads_resolve_subdomains_from_targets(
             logger,
             mythreads.all_threads,
             mythreads.q_targets,
-            mythreads.subdomains
+            mythreads.subdomains, 
+            domain=args.domain,
+            num_threads=int(args.threads)
         )
 
         logger.debug("Joining main to running threads in background")

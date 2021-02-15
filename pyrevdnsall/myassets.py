@@ -6,8 +6,8 @@ import socket
 def expand_ip_range(logger, ip_range):
     """Expand IP range to individual IPs"""
     logger.debug(f"Expanding IP range: {ip_range} to individual IPs")
-    r = IPv4Network(ip_range)
-    return [str(ip) for ip in ip_range]
+    r = ipaddress.IPv4Network(ip_range)
+    return [str(ip) for ip in r]
 
 def get_slash_24_ips_from_ip(logger, ip):
     """Get the /24 IP range from IP"""

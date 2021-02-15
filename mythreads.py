@@ -142,11 +142,14 @@ def resolve_subdomains_from_targets(logger, q_targets, subdomains, domain=""):
                         else:
                             logger.debug(f"subdomain: {subdomain} already exists")
                 else:
-                    logger.debug(f"No domain provided for filtering, so adding: {subdomain}"
-                                f"to subdomains list")
-                    logger.info(f"subdomain: {subdomain} added to subdomains")
-                    subdomains[subdomain] = '1'
-                    print(subdomain)
+                    if myvalidation.is_domain(logger, subdomain):
+                        logger.debug(f"No domain provided for filtering, so adding: {subdomain} "
+                                    f"to subdomains list")
+                        logger.info(f"subdomain: {subdomain} added to subdomains")
+                        subdomains[subdomain] = '1'
+                        print(subdomain)
+                    else:
+                        logger.debug(f"No subdomain provided. But, {subdomain} is not a domain. Not added.")
 
 def launch_threads_resolve_subdomains_from_targets(logger, all_threads, q_targets, 
     subdomains, domain="", num_threads=DEFAULT_NUM_PROCESSING_THREADS):

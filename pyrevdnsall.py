@@ -17,6 +17,8 @@ valid subdomains for an optionally given domain
 def main():
     parser = argparse.ArgumentParser(description=DESCRIPTION, 
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("-i", "--input-file", required=True,
+        help="Input file to read IPs")
     parser.add_argument("-d", "--domain", 
         help="Main Domain to use to identify valid subdomains")
     parser.add_argument("-t", "--threads", default=DEFAULT_NUM_THREADS,
@@ -26,10 +28,11 @@ def main():
     logger = mylogging.configure_basic_logging()
 
     try:
-        mythreads.launch_thread_read_line_from_stdin(
+        mythreads.launch_thread_read_lines(
             logger, 
             mythreads.all_threads,
-            mythreads.q_stdin)
+            mythreads.q_stdin,
+            file_to_read=args.input_file)
 
         mythreads.launch_threads_process_input_to_targets(
             logger, 

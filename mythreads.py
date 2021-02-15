@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import queue
 import sys
 import threading
@@ -32,26 +33,32 @@ DEFAULT_NUM_PROCESSING_THREADS = 1
 """Default time to block queues to read next input. If passed, then kill thread."""
 DEFAULT_Q_TIMEOUT = 3
 
-def read_lines_from_stdin(logger, q_stdin):
+def read_lines(logger, q_stdin, file_to_read):
     """Function Reads the lines from stdin and adds it to a queue"""
     if not q_stdin:
         logger.error("in_queue empty - cannot read lines from input. Run configure"
                      " first.")
     else:
-        try:
-            for l in sys.stdin:
-                if not kill_thread_read_lines_from_stdin:
-                    l_strip = l.strip()
-                    logger.debug(f"Added input line: {l_strip} for processing")
-                    q_stdin.put(l_strip)
-                else:
-                    break
-        except KeyboardInterrupt:
-            logger.debug("Breaking loop to read input")
+        if not os.path.isfile(file_to_read):
+            logger.error(f"File: {file_to_read} does not exist.")
+        else:
+            with open(file_to_read, "r+") as f:
+                try:
+                    for l in f.readlines():
+                        if not kill_thread_read_lines_from_stdin:
+                            l_strip = l.strip()
+                            logger.debug(f"Added input line: {l_strip}")
+                            q_stdin.put(l_strip)
+                        else:
+                            break
+                except KeyboardInterrupt:
+                    logger.debug("Breaking loop to read input")
     
-def launch_thread_read_line_from_stdin(logger, all_threads, q_stdin):
+def launch_thread_read_lines(logger, all_threads, q_stdin, 
+    file_to_read):
     """Start thread to Read the input lines which contains the target"""
-    t = threading.Thread(target=read_lines_from_stdin, args=(logger,q_stdin,))
+    t = threading.Thread(target=read_lines, 
+        args=(logger, q_stdin, file_to_read,))
     all_threads.append(t)
     t.start()
     return t
@@ -129,13 +136,15 @@ def resolve_subdomains_from_targets(logger, q_targets, subdomains, domain=""):
                     if myvalidation.is_subdomain(logger, subdomain, domain):
                         logger.debug(f"domain: {subdomain} is subdomain of domain")
                         if subdomain not in subdomains:
-                            logger.debug(f"subdomain: {subdomain} added to subdomains")
+                            logger.info(f"subdomain: {subdomain} added to subdomains")
+                            print(subdomain)
                             subdomains[subdomain] = '1'
                         else:
                             logger.debug(f"subdomain: {subdomain} already exists")
                 else:
                     logger.debug(f"No domain provided for filtering, so adding: {subdomain}"
                                 f"to subdomains list")
+                    logger.info(f"subdomain: {subdomain} added to subdomains")
                     subdomains[subdomain] = '1'
                     print(subdomain)
 

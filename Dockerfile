@@ -8,4 +8,4 @@ RUN apk add --update \
 COPY . /app
 WORKDIR /app
 
-ENTRYPOINT [ "python3", "pyrevdnsall.py" ]
+ENTRYPOINT [ "python3", "-u", "pyrevdnsall.py" ]
